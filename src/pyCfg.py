@@ -13,6 +13,7 @@ from PyQt5.QtWidgets import QDialog, QHeaderView, QMessageBox, QColorDialog, QTr
 if "mobase" not in sys.modules:
     import mock_mobase as mobase
 
+
 class CaselessDict(dict):
     """Dictionary that enables case insensitive searching while preserving case sensitivity 
 when keys are listed, ie, via keys() or items() methods. 
@@ -110,8 +111,8 @@ class MainWindow(QDialog):
                 self.__save()
             elif res == QMessageBox.Cancel:
                 event.ignore()
-        #else:
-        #    super(MainWindow,  self).__init__(event)
+        else:
+            super(MainWindow,  self).closeEvent(event)
 
     def __save(self):
         self.saveSettings.emit(self.__settings)
@@ -187,7 +188,6 @@ class MainWindow(QDialog):
             self.sender().setIcon(QtGui.QIcon(":/pyCfg/false"))
 
     # qt5
-    # def __editBoxChanged(self, ignore):
     def __editBoxChanged(self):
         self.__valueChanged(self.sender(),  str(self.sender().text()))
 
@@ -357,7 +357,6 @@ class MainWindow(QDialog):
         self.__updateTree()
 
 
-
 class MagicFile(file):
     def __init__(self, filename, mode):
         super(MagicFile, self).__init__(filename, mode)
@@ -430,21 +429,21 @@ class IniEdit(mobase.IPluginTool):
         self.__parentWidget = widget
 
     def __iniFiles(self):
-        gameType = self.__organizer.managedGame().getGameShortName()
-        if str(gameType) == "Oblivion":
+        gameName = self.__organizer.managedGame().getGameShortName().toLower()
+        if gameName == "oblivion":
             return ["oblivion.ini",  "oblivionprefs.ini"]
-        elif str(gameType) == "Fallout3" or str(gameType) == "FalloutNV":
+        elif gameName == "fallout3" or gameName == "falloutnv":
             return ["fallout.ini",  "falloutprefs.ini"]
-        elif str(gameType) == "Skyrim":
+        elif gameName == "skyrim":
             return ["skyrim.ini",  "skyrimprefs.ini"]
-        elif str(gameType) == "Fallout4":
+        elif gameName == "fallout4":
             return ["fallout4.ini", "fallout4prefs.ini", "fallout4custom.ini"]
         else:
             return []
 
     def __filteredSettings(self):
         newSettings = CaselessDict()
-        gameName = str(self.__organizer.gameInfo().type())
+        gameName = str(self.__organizer.managedGame().getGameShortName())
         
         iniFiles = self.__iniFiles()
         
